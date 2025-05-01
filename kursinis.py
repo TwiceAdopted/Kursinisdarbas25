@@ -1,15 +1,7 @@
 #!/usr/bin/env python3
-"""birthday_reminder.py – single‑file OOP coursework project (cross‑version)
-
-This script now **runs on Python 3.7 → 3.12**, has a complete CLI, and all
-unit‑tests pass.  It fulfils every coursework requirement while staying
-self‑contained.
-
-*Run examples*
-===============
-```bash
-python3 birthday_reminder.py --help        # usage screen
-python3 birthday_reminder.py --test        # run tests
+"""
+python3 birthday_reminder.py --help        # taisykles
+python3 birthday_reminder.py --test        # testai
 python3 birthday_reminder.py add    --user alice --name "Bob" --day 6 --month 2
 python3 birthday_reminder.py list   --user alice
 python3 birthday_reminder.py remind --user alice --channel console
@@ -29,22 +21,16 @@ from datetime import date
 from pathlib import Path
 from typing import Dict, List
 
-###########################################################################
-# Helper: safe_dataclass – honours ``slots`` only on Python ≥ 3.10
-###########################################################################
 
-def safe_dataclass(**kwargs):  # type: ignore[override]
+
+def safe_dataclass(**kwargs):  
     """Return a :pyfunc:`dataclass` decorator that ignores *slots* pre‑3.10."""
 
-    from dataclasses import dataclass as _dc  # local import to keep top tidy
+    from dataclasses import dataclass as _dc  
 
     if sys.version_info < (3, 10):
         kwargs.pop("slots", None)
-    return _dc(**kwargs)  # type: ignore[arg-type]
-
-###########################################################################
-# Domain layer                                                              
-###########################################################################
+    return _dc(**kwargs)  
 
 
 @safe_dataclass(frozen=True, slots=True)
@@ -55,7 +41,7 @@ class Birthday:
     day: int
     month: int
 
-    def occurs_today(self, today: date | None = None) -> bool:  # pragma: no cover
+    def occurs_today(self, today: date | None = None) -> bool:  
         today = today or date.today()
         return self.day == today.day and self.month == today.month
 
@@ -65,9 +51,9 @@ class User:
 
     def __init__(self, username: str) -> None:
         self._username: str = username
-        self._birthdays: List[Birthday] = []  # encapsulated list
+        self._birthdays: List[Birthday] = []  
 
-    # -------------------------- read‑only views ------------------------- #
+    
     @property
     def username(self) -> str:  # abstraction
         return self._username
@@ -76,7 +62,7 @@ class User:
     def birthdays(self) -> tuple[Birthday, ...]:
         return tuple(self._birthdays)
 
-    # ----------------------------- behaviour --------------------------- #
+   
     def add_birthday(self, birthday: Birthday) -> None:
         if any(b.name == birthday.name for b in self._birthdays):
             raise ValueError("Birthday already exists for that name.")
@@ -110,7 +96,7 @@ class _Storage:
             cls._instance._load()
         return cls._instance
 
-    # -------------------------- private helpers ------------------------ #
+    
     def _load(self) -> None:
         if self._path.exists():
             with self._path.open(encoding="utf‑8") as fp:
@@ -132,7 +118,7 @@ class _Storage:
         with self._path.open("w", encoding="utf‑8") as fp:
             json.dump(data, fp, indent=2)
 
-    # ---------------------------- public API --------------------------- #
+    
     def get_user(self, username: str) -> User:
         if username not in self._users:
             self._users[username] = User(username)
@@ -142,7 +128,7 @@ class _Storage:
         self._save()
 
 
-Storage = _Storage  # alias without underscore for outside use
+Storage = _Storage  
 
 ###########################################################################
 # Notification strategies (polymorphism + Factory Method)
@@ -238,16 +224,13 @@ def _cmd_remind(ns: argparse.Namespace) -> None:
     for bd in todays:
         notifier.send(user, bd, date.today())
 
-###########################################################################
-# Unit‑tests
-###########################################################################
+
 
 
 class _TestBirthdayReminder(unittest.TestCase):
     """Basic happy‑path tests + CLI no‑args behaviour."""
 
     def setUp(self) -> None:
-        # redirect storage to a temp JSON in cwd
         self.tmp = Path(".test_birthdays.json")
         _Storage._instance = None  # reset singleton
         _Storage._path = self.tmp  # type: ignore[attr-defined]
@@ -261,7 +244,6 @@ class _TestBirthdayReminder(unittest.TestCase):
     def test_add_and_persist(self) -> None:
         self.user.add_birthday(Birthday("Bob", 6, 2))
         self.store.save()
-        # force fresh load
         _Storage._instance = None
         fresh_user = Storage().get_user("alice")
         self.assertEqual(len(fresh_user.birthdays), 1)
@@ -270,13 +252,11 @@ class _TestBirthdayReminder(unittest.TestCase):
     def test_cli_no_args_prints_help_and_returns_zero(self) -> None:
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
-            rc = _main([])  # simulate no CLI args
+            rc = _main([])  
         self.assertEqual(rc, 0)
         self.assertIn("usage", buf.getvalue().lower())
 
-###########################################################################
-# Parser & entry‑point
-###########################################################################
+
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -321,7 +301,7 @@ def _main(argv: List[str] | None = None) -> int:
     argv = argv if argv is not None else sys.argv[1:]
     parser = _build_parser()
 
-    # No args → print help & exit zero (user asked earlier)
+    
     if not argv:
         parser.print_help()
         return 0
@@ -329,17 +309,17 @@ def _main(argv: List[str] | None = None) -> int:
     ns = parser.parse_args(argv)
 
     if ns.test:
-        # run unit tests and propagate their result code
+        
         result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(_TestBirthdayReminder))
         return 0 if result.wasSuccessful() else 1
 
-    if ns.cmd is None:  # unknown command – argparse will already have complained
+    if ns.cmd is None:  
         return 1
 
-    # Dispatch to the function bound by set_defaults
-    ns.func(ns)  # type: ignore[attr-defined]
+    
+    ns.func(ns)  
     return 0
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":  
     sys.exit(_main())
