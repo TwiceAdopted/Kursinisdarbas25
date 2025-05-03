@@ -68,7 +68,7 @@ access point would be a radio frequency that all the planes use to contact the t
 * Application runs on Python 3.7‑3.12 and passes all tests.  
 * All coursework requirements met, verified by manual review.
 * Learned practical use of Factory‑Method & Singleton patterns. Hardedst part was setting up github, understanding how and when the terminal works, where to direct it.
-* The code obviusly had lots of errors, but nothing a little time invested cant fix :) 
+* The code obviusly had lots of errors, but nothing a little time invested cant fix, wathced lots of youtube videos, asked for lots of help. :) 
 
 ## 4  Conclusions
 
