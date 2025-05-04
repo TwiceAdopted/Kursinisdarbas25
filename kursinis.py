@@ -141,7 +141,7 @@ class Notifier(ABC):
 
 
 class ConsoleNotifier(Notifier):
-    def send(self, user: User, birthday: Birthday, today: date) -> None:  # noqa: D401
+    def send(self, user: User, birthday: Birthday, today: date) -> None: 
         print(
             f"🎉  Hey {user.username}!  "
             f"Today ({today:%Y‑%m‑%d}) is {birthday.name}'s birthday!"
@@ -152,7 +152,7 @@ class EmailNotifier(Notifier):
     def __init__(self, address: str) -> None:
         self._address = address
 
-    def send(self, user: User, birthday: Birthday, today: date) -> None:  # noqa: D401
+    def send(self, user: User, birthday: Birthday, today: date) -> None:  
         print(
             f"[Simulated email to {self._address}] "
             f"Reminder: {birthday.name}'s birthday is today ({today:%d %b})."
