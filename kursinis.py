@@ -24,7 +24,7 @@ from typing import Dict, List
 
 
 def safe_dataclass(**kwargs):  
-    """Return a :pyfunc:`dataclass` decorator that ignores *slots* pre‑3.10."""
+    
 
     from dataclasses import dataclass as _dc  
 
@@ -35,8 +35,7 @@ def safe_dataclass(**kwargs):
 
 @safe_dataclass(frozen=True, slots=True)
 class Birthday:
-    """Immutable value object representing one birthday."""
-
+   
     name: str
     day: int
     month: int
@@ -47,7 +46,7 @@ class Birthday:
 
 
 class User:
-    """A *User* who owns 0‒n :class:`Birthday` records (composition)."""
+    
 
     def __init__(self, username: str) -> None:
         self._username: str = username
@@ -84,8 +83,7 @@ class User:
 
 
 class _Storage:
-    """JSON‑backed persistence implemented as a Singleton."""
-
+    
     _instance: "_Storage" | None = None
     _path: Path = Path.home() / ".birthday_reminder.json"
 
@@ -228,12 +226,11 @@ def _cmd_remind(ns: argparse.Namespace) -> None:
 
 
 class _TestBirthdayReminder(unittest.TestCase):
-    """Basic happy‑path tests + CLI no‑args behaviour."""
-
+    
     def setUp(self) -> None:
         self.tmp = Path(".test_birthdays.json")
-        _Storage._instance = None  # reset singleton
-        _Storage._path = self.tmp  # type: ignore[attr-defined]
+        _Storage._instance = None  
+        _Storage._path = self.tmp  
         self.store = Storage()
         self.user = self.store.get_user("alice")
 
